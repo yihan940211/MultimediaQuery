@@ -27,7 +27,7 @@ import javax.sound.sampled.SourceDataLine;
 public class Video { 
     class PlayVideo implements Runnable {
         public void run() {
-            int readBytes = 0;
+            int nBytes = 0;
             byte[] audioBuffer = new byte[bufferSize];
             while (true) {;
                 lock.lock();
@@ -35,24 +35,17 @@ public class Video {
                 boolean tempStop = stop;
                 lock.unlock();
                 if (!tempPause && !tempStop) {
-                    File file = new File(folder + "/" + videoName + String.format("%03d", currentFrame) + ".rgb");
-                    if (!file.exists()) {
+                    if(currentFrame > totalFrames) {
                         currentFrame = 1;
                         closeAudio();
                         openAudio();
                     }
-                    readImage(folder + "/" + videoName + String.format("%03d", currentFrame) + ".rgb");
+                    File file = new File(folder + "/" + videoName + String.format("%03d", currentFrame) + ".rgb");
+                    currentImage = readImage(folder + "/" + videoName + String.format("%03d", currentFrame) + ".rgb");
                     displayImage();
                     
-                    try{
-                        
-                        readBytes = audioInputStream.read(audioBuffer, 0, audioBuffer.length);
-                        if(readBytes >= 0) {
-                            dataLine.write(audioBuffer, 0, readBytes);
-                        }
-                    } catch(Exception e){
-                        
-                    } 
+                    nBytes = readAudio(audioBuffer);
+                    playAudio(audioBuffer, nBytes);
                     
                     try {
                         Thread.sleep(1000 / frameRate);
@@ -81,6 +74,7 @@ public class Video {
     DisplayMain displayMain;
     String folder;
     String videoName;
+    int totalFrames;
     int currentFrame;
     BufferedImage currentImage;
     AudioInputStream audioInputStream;
@@ -96,6 +90,7 @@ public class Video {
         this.displayMain = displayMain;
         this.folder = folder;
         this.videoName = folder.substring(folder.lastIndexOf("/") + 1);
+        this.totalFrames = (new File(folder)).list().length - 1;
         this.currentFrame = 1;
         this.currentImage = null;
         openAudio();
@@ -104,8 +99,8 @@ public class Video {
         this.lock = new ReentrantLock();
     }
     
-    public void readImage(String path){
-        currentImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+    public BufferedImage readImage(String path){
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         
         try{
             File file = new File(path);
@@ -132,7 +127,7 @@ public class Video {
                     byte b = bytes[ind+height*width*2];
 
                     int pix = 0xff000000 | ((r & 0xff) << 16) | ((g & 0xff) << 8) | (b & 0xff);
-                    currentImage.setRGB(x,y,pix);
+                    image.setRGB(x,y,pix);
                     ind++;
                 }
             }
@@ -141,6 +136,8 @@ public class Video {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        
+        return image;
     }
     
     public void displayImage(){
@@ -166,7 +163,21 @@ public class Video {
         }
     }
     
+    public int readAudio(byte[] audioBuffer) {
+        int nBytes = -1;
+        try{
+            nBytes = audioInputStream.read(audioBuffer, 0, audioBuffer.length);
+        } catch(Exception e) {
+            
+        }
+        return nBytes;                                 
+    }
     
+    public void playAudio(byte[] audioBuffer, int nBytes) {
+        if(nBytes >= 0) {
+            dataLine.write(audioBuffer, 0, nBytes);
+        }
+    }
     
     public void closeAudio(){
         dataLine.close();

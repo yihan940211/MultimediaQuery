@@ -7,9 +7,12 @@ package multimediaquery;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.List;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import multimediaquery.QueryEngine.VideoFeatures;
 
 /**
  *
@@ -37,9 +40,9 @@ public class DisplayMain extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        buttonPlayQueriedVideo = new javax.swing.JButton();
+        buttonPauseQueriedVideo = new javax.swing.JButton();
+        buttonStopQueriedVideo = new javax.swing.JButton();
         labelQueriedVideo = new javax.swing.JLabel();
         textFieldPath = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
@@ -47,13 +50,13 @@ public class DisplayMain extends javax.swing.JFrame {
         buttonChooseVideo = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
-        jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
-        jButton6 = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
-        labelSelectedVideo = new javax.swing.JLabel();
+        buttonPlayMatchedVideo = new javax.swing.JButton();
+        buttonPauseMatchedVideo = new javax.swing.JButton();
+        buttonStopMatchedVideo = new javax.swing.JButton();
+        labelMatchedVideo = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        listQueryResults = new javax.swing.JList<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -64,27 +67,27 @@ public class DisplayMain extends javax.swing.JFrame {
         jPanel2.setPreferredSize(new java.awt.Dimension(375, 700));
         jPanel2.setSize(new java.awt.Dimension(250, 500));
 
-        jButton1.setText("Play");
-        jButton1.setPreferredSize(new java.awt.Dimension(75, 30));
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        buttonPlayQueriedVideo.setText("Play");
+        buttonPlayQueriedVideo.setPreferredSize(new java.awt.Dimension(75, 30));
+        buttonPlayQueriedVideo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                buttonPlayQueriedVideoActionPerformed(evt);
             }
         });
 
-        jButton2.setText("Pause");
-        jButton2.setPreferredSize(new java.awt.Dimension(75, 30));
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        buttonPauseQueriedVideo.setText("Pause");
+        buttonPauseQueriedVideo.setPreferredSize(new java.awt.Dimension(75, 30));
+        buttonPauseQueriedVideo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                buttonPauseQueriedVideoActionPerformed(evt);
             }
         });
 
-        jButton3.setText("Stop");
-        jButton3.setPreferredSize(new java.awt.Dimension(75, 30));
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        buttonStopQueriedVideo.setText("Stop");
+        buttonStopQueriedVideo.setPreferredSize(new java.awt.Dimension(75, 30));
+        buttonStopQueriedVideo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                buttonStopQueriedVideoActionPerformed(evt);
             }
         });
 
@@ -93,11 +96,11 @@ public class DisplayMain extends javax.swing.JFrame {
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(buttonPlayQueriedVideo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(buttonPauseQueriedVideo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(12, 12, 12)
-                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(buttonStopQueriedVideo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
@@ -105,15 +108,17 @@ public class DisplayMain extends javax.swing.JFrame {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(buttonPauseQueriedVideo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(buttonPlayQueriedVideo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(buttonStopQueriedVideo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         labelQueriedVideo.setText("Queried Video");
         labelQueriedVideo.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         labelQueriedVideo.setPreferredSize(new java.awt.Dimension(352, 288));
         labelQueriedVideo.setSize(new java.awt.Dimension(352, 288));
+
+        textFieldPath.setEditable(false);
 
         jLabel4.setText("Queried Video:");
 
@@ -172,14 +177,29 @@ public class DisplayMain extends javax.swing.JFrame {
         jPanel3.setPreferredSize(new java.awt.Dimension(375, 700));
         jPanel3.setSize(new java.awt.Dimension(250, 500));
 
-        jButton4.setText("Play");
-        jButton4.setPreferredSize(new java.awt.Dimension(75, 30));
+        buttonPlayMatchedVideo.setText("Play");
+        buttonPlayMatchedVideo.setPreferredSize(new java.awt.Dimension(75, 30));
+        buttonPlayMatchedVideo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonPlayMatchedVideoActionPerformed(evt);
+            }
+        });
 
-        jButton5.setText("Pause");
-        jButton5.setPreferredSize(new java.awt.Dimension(75, 30));
+        buttonPauseMatchedVideo.setText("Pause");
+        buttonPauseMatchedVideo.setPreferredSize(new java.awt.Dimension(75, 30));
+        buttonPauseMatchedVideo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonPauseMatchedVideoActionPerformed(evt);
+            }
+        });
 
-        jButton6.setText("Stop");
-        jButton6.setPreferredSize(new java.awt.Dimension(75, 30));
+        buttonStopMatchedVideo.setText("Stop");
+        buttonStopMatchedVideo.setPreferredSize(new java.awt.Dimension(75, 30));
+        buttonStopMatchedVideo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonStopMatchedVideoActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -187,11 +207,11 @@ public class DisplayMain extends javax.swing.JFrame {
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addGap(7, 7, 7)
-                .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(buttonPlayMatchedVideo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(buttonPauseMatchedVideo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(12, 12, 12)
-                .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(buttonStopMatchedVideo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(113, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
@@ -199,20 +219,18 @@ public class DisplayMain extends javax.swing.JFrame {
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(buttonPauseMatchedVideo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(buttonPlayMatchedVideo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(buttonStopMatchedVideo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
-        jList1.setPreferredSize(new java.awt.Dimension(352, 85));
-        jList1.setSize(new java.awt.Dimension(352, 136));
-        jScrollPane1.setViewportView(jList1);
-
-        labelSelectedVideo.setText("Selected Video");
-        labelSelectedVideo.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        labelSelectedVideo.setPreferredSize(new java.awt.Dimension(352, 288));
+        labelMatchedVideo.setText("Matched Video");
+        labelMatchedVideo.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        labelMatchedVideo.setPreferredSize(new java.awt.Dimension(352, 288));
 
         jLabel3.setText("Matched Videos:");
+
+        jScrollPane1.setViewportView(listQueryResults);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -222,8 +240,8 @@ public class DisplayMain extends javax.swing.JFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(labelSelectedVideo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(labelMatchedVideo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 320, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
@@ -231,10 +249,10 @@ public class DisplayMain extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(labelSelectedVideo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(labelMatchedVideo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -276,37 +294,31 @@ public class DisplayMain extends javax.swing.JFrame {
 
     private void buttonQueryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonQueryActionPerformed
         // TODO add your handling code here:
-        
-        String folder = textFieldPath.getText();
-        File file = new File(folder);
-        if(!file.exists()){
-            JOptionPane.showMessageDialog(null, "Wrong Video Path!");
-        }else {
-            if(queriedVideo != null) queriedVideo.stop();
-            queriedVideo = new Video(this, folder, 1);
-        }
+        if(queriedVideo == null)return;
+        queryEngine.query(queriedVideo);
     }//GEN-LAST:event_buttonQueryActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void buttonPlayQueriedVideoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPlayQueriedVideoActionPerformed
         // TODO add your handling code here:
         if(queriedVideo == null)return;
         queriedVideo.play();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_buttonPlayQueriedVideoActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void buttonPauseQueriedVideoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPauseQueriedVideoActionPerformed
         // TODO add your handling code here:
         if(queriedVideo == null)return;
         queriedVideo.pause();
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_buttonPauseQueriedVideoActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void buttonStopQueriedVideoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonStopQueriedVideoActionPerformed
         // TODO add your handling code here:
         if(queriedVideo == null)return;
         queriedVideo.stop();
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_buttonStopQueriedVideoActionPerformed
 
     private void buttonChooseVideoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonChooseVideoActionPerformed
         // TODO add your handling code here:
+        if(queriedVideo != null) queriedVideo.stop();
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -314,8 +326,36 @@ public class DisplayMain extends javax.swing.JFrame {
         if(result == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
             textFieldPath.setText(file.getAbsolutePath());
+            queriedVideo = new Video(this, file.getAbsolutePath(), 1);
+            queriedVideo.play();
         }
     }//GEN-LAST:event_buttonChooseVideoActionPerformed
+
+    private void buttonPlayMatchedVideoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPlayMatchedVideoActionPerformed
+        // TODO add your handling code here:
+        if(matchedVideo != null) matchedVideo.stop();
+        if(listQueryResults.getSelectedIndex() < 0)return;
+        String videoName = listQueryResults.getSelectedValue().split("\t")[0];
+        for(VideoFeatures videoFeatures : queryEngine.videosFeatures) {
+            if(videoFeatures.video.videoName.equals(videoName)) {
+                matchedVideo = videoFeatures.video;
+                break;
+            }
+        }
+        matchedVideo.play();
+    }//GEN-LAST:event_buttonPlayMatchedVideoActionPerformed
+
+    private void buttonPauseMatchedVideoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPauseMatchedVideoActionPerformed
+        // TODO add your handling code here:
+        if(matchedVideo == null)return;
+        matchedVideo.pause();
+    }//GEN-LAST:event_buttonPauseMatchedVideoActionPerformed
+
+    private void buttonStopMatchedVideoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonStopMatchedVideoActionPerformed
+        // TODO add your handling code here:
+        if(matchedVideo == null)return;
+        matchedVideo.stop();
+    }//GEN-LAST:event_buttonStopMatchedVideoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -354,33 +394,37 @@ public class DisplayMain extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonChooseVideo;
+    private javax.swing.JButton buttonPauseMatchedVideo;
+    private javax.swing.JButton buttonPauseQueriedVideo;
+    private javax.swing.JButton buttonPlayMatchedVideo;
+    private javax.swing.JButton buttonPlayQueriedVideo;
     private javax.swing.JButton buttonQuery;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
+    private javax.swing.JButton buttonStopMatchedVideo;
+    private javax.swing.JButton buttonStopQueriedVideo;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JList<String> jList1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel labelMatchedVideo;
     private javax.swing.JLabel labelQueriedVideo;
-    private javax.swing.JLabel labelSelectedVideo;
+    private javax.swing.JList<String> listQueryResults;
     private javax.swing.JTextField textFieldPath;
     // End of variables declaration//GEN-END:variables
 
     private Video queriedVideo;
-    private Video selectedVideo;
+    private Video matchedVideo;
+    private String databasePath;
+    private QueryEngine queryEngine;
     
     public void myInit(){
         queriedVideo = null;
-        selectedVideo = null;
+        matchedVideo = null;
+        databasePath = "/Users/yihanyang/Documents/USCCourse/CSCI576/Project/databse_videos";
+        queryEngine = new QueryEngine(this, databasePath);
     }
     
     public void displayQueriedVideo(BufferedImage image){
@@ -388,6 +432,15 @@ public class DisplayMain extends javax.swing.JFrame {
     }
     
     public void displaySelectedVideo(BufferedImage image){
-        labelSelectedVideo.setIcon(new ImageIcon(image));
+        labelMatchedVideo.setIcon(new ImageIcon(image));
+    }
+    
+    public void displayQueryResults(List<QueryEngine.VideoFeatures> queryResults) {
+        DefaultListModel<String> defaultListModel = new DefaultListModel<>();
+        for(int i = 0; i < queryResults.size(); i++) {
+            VideoFeatures videoFeatures = queryResults.get(i);
+            defaultListModel.add(i, videoFeatures.video.videoName + "\t" + videoFeatures.dist);
+        }
+        listQueryResults.setModel(defaultListModel);
     }
 }

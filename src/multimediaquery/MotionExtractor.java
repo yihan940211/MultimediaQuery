@@ -38,7 +38,7 @@ public class MotionExtractor {
     public double MAD(BufferedImage targetImage, int targetX, int targetY, BufferedImage candidateImage, int candidateX, int candidateY) {
         int curBlockHeight = Math.min(blockHeight, targetImage.getHeight() - targetY);
         int curBlockWidth = Math.min(blockWidth, targetImage.getWidth() - targetX);
-        double diff = 0;
+        double dist = 0;
         
         for(int diffY = 0; diffY < curBlockHeight; diffY++) {
             for(int diffX = 0; diffX < curBlockWidth; diffX++) {
@@ -52,10 +52,10 @@ public class MotionExtractor {
                 int candidateG = ((candidatePixel >>> 8) & (0xff));
                 int candidateB = (candidatePixel & (0xff));
                 
-                diff += Math.abs(targetR - candidateR) + Math.abs(targetG - candidateG) + Math.abs(targetB - candidateB);
+                dist += Math.abs(targetR - candidateR) + Math.abs(targetG - candidateG) + Math.abs(targetB - candidateB);
             }
         }
         
-        return diff / (curBlockHeight * curBlockWidth);
+        return dist / (curBlockHeight * curBlockWidth);
     }
 }

@@ -181,4 +181,40 @@ public class ColorExtractor {
             return 0;
         }
     }
+    
+    public List<Double> colorDistance(List<List<Integer>> queriedVideoColors, List<List<Integer>> candidateVideoColors) {
+        List<Double> distList = new ArrayList<>();
+        int nFrame = queriedVideoColors.size();
+        int nTotalFrame = candidateVideoColors.size();
+        
+        for(int cur = 0; cur < nTotalFrame - nFrame; cur++) {
+            distList.add(colorDistance(queriedVideoColors, candidateVideoColors, cur));
+        }
+        
+        return distList;
+    } 
+    
+    public double colorDistance(List<List<Integer>> queriedVideoColors, List<List<Integer>> candidateVideoColors, int sFrame) {
+        double dist = 0;
+        int nFrame = queriedVideoColors.size();
+        int nColors = queriedVideoColors.get(0).size();
+        for(int i = 0; i < nFrame; i++) {
+            List<Integer> queriedFrameColors = queriedVideoColors.get(i);
+            List<Integer> candidateFrameColors = candidateVideoColors.get(i + sFrame);
+            for(int j = 0; j < nColors; j++) {
+                int queriedColor = queriedFrameColors.get(j);
+                int queriedR = ((queriedColor >>> 16) & (0xff));
+                int queriedG = ((queriedColor >>> 8) & (0xff));
+                int queriedB = (queriedColor & (0xff));
+                
+                int candidateColor = candidateFrameColors.get(j);
+                int candidateR = ((candidateColor >>> 16) & (0xff));
+                int candidateG = ((candidateColor >>> 8) & (0xff));
+                int candidateB = (candidateColor & (0xff));
+                
+                dist = dist + Math.abs(queriedR - candidateR) + Math.abs(queriedG - candidateG) + Math.abs(queriedB - candidateB);
+            }
+        }
+        return dist / (nFrame * nColors);
+    }
 }
