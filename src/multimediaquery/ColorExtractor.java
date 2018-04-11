@@ -182,6 +182,70 @@ public class ColorExtractor {
         }
     }
     
+    public List<Integer> uniformQuantization(BufferedImage image, int nR, int nG, int nB) {
+        int height = image.getHeight();
+        int width = image.getWidth();
+        List<Integer> bucketR = new ArrayList<>();
+        List<Integer> bucketG = new ArrayList<>();
+        List<Integer> bucketB = new ArrayList<>();
+        
+        for(int y = 0; y < height; y++){
+            for(int x = 0; x < width; x++){
+                int pixel = image.getRGB(x, y);
+                bucketR.add((pixel >>> 16) & (0xff));
+                bucketG.add((pixel >>> 8) & (0xff));
+                bucketB.add(pixel & (0xff));
+            }
+        }
+        
+        List<Integer> colorsR = uniformQuantizationHelper(bucketR, nR);
+        List<Integer> colorsG = uniformQuantizationHelper(bucketG, nG);
+        List<Integer> colorsB = uniformQuantizationHelper(bucketB, nB);
+        
+        List<Integer> colors = new ArrayList<>();
+        for(int i = 0; i < nR; i++) {
+            for(int j = 0; j < nG; j++) {
+                for(int k = 0; k < nB; k++) {
+                    int r = colorsR.get(i);
+                    int g = colorsG.get(j);
+                    int b = colorsB.get(k);
+                    int pixel = 0xff000000 | ((r & 0xff) << 16) | ((g & 0xff) << 8) | (b & 0xff);
+                    colors.add(pixel);
+                }
+            }
+        }
+        
+        return colors;
+    }
+    
+    public List<Integer> uniformQuantizationHelper(List<Integer> pixels, int n) {
+        List<Integer> res = new ArrayList<>();
+        int range = pixels.size() / n;
+        
+        pixels.sort(new Comparator<Integer>() {
+            public int compare(Integer pixel1, Integer pixel2) {
+                return pixel1 - pixel2;
+            }
+        });
+        
+        for(int i = 0; i < n; i++) {
+            long sum = 0;
+            if(i != n - 1) {
+                for(int j = i * range; j < (i + 1) * range; j++) {
+                    sum += pixels.get(j);
+                }
+                res.add((int)(sum / range));
+            } else {
+                for(int j = i * range; j < pixels.size(); j++) {
+                    sum += pixels.get(j);
+                }
+                res.add((int)(sum / (pixels.size() - i * range)));
+            }
+        }
+        
+        return res;
+    }
+    
     public List<Double> colorDistance(List<List<Integer>> queriedVideoColors, List<List<Integer>> candidateVideoColors) {
         List<Double> distList = new ArrayList<>();
         int nFrame = queriedVideoColors.size();
