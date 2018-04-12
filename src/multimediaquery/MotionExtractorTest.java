@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Set;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -103,7 +104,7 @@ public class MotionExtractorTest {
         frame.setVisible(true);
     }
     
-    public BufferedImage showMotions(BufferedImage image, List<String> motions) {
+    public BufferedImage showMotions(BufferedImage image, Set<String> motions) {
         int blockWidth = MotionExtractor.blockWidth;
         int blockHeight = MotionExtractor.blockHeight;
         BufferedImage resImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -124,15 +125,15 @@ public class MotionExtractorTest {
     }
 
     public static void main(String[] args) {
-        String folderPath = "/Users/yihanyang/Documents/USCCourse/CSCI576/Project/query/second";
-        String targetImagePath = folderPath + "/second010.rgb";
-        String candidateImagePath = folderPath + "/second011.rgb";
+        String folderPath = "/Users/yihanyang/Documents/USCCourse/CSCI576/Project/databse_videos/sports";
+        String targetImagePath = folderPath + "/sports127.rgb";
+        String candidateImagePath = folderPath + "/sports128.rgb";
         MotionExtractorTest test = new MotionExtractorTest();
         MotionExtractor motionExtractor = new MotionExtractor();
         
         BufferedImage targetImage = test.readImage(targetImagePath);
         BufferedImage candidateImage = test.readImage(candidateImagePath);
-        List<String> motions = motionExtractor.motionExtractor(targetImage, candidateImage);
+        Set<String> motions = motionExtractor.motionExtractor(targetImage, candidateImage);
         BufferedImage targetMotionsImage = test.showMotions(targetImage, motions);
         BufferedImage candidateMotionsImage = test.showMotions(candidateImage, motions);
         test.displayImage(targetImage, candidateImage);

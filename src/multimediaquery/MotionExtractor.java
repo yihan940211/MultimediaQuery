@@ -7,7 +7,9 @@ package multimediaquery;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -18,10 +20,10 @@ public class MotionExtractor {
     static final int blockWidth = 16;
     static final int blockHeight = 16;
     
-    public List<String> motionExtractor(BufferedImage targetImage, BufferedImage candidateImage) {
+    public Set<String> motionExtractor(BufferedImage targetImage, BufferedImage candidateImage) {
         int height = targetImage.getHeight();
         int width = targetImage.getWidth();
-        List<String> motions = new ArrayList<>();
+        Set<String> motions = new HashSet<>();
 
         for (int targetY = 0; targetY < height; targetY += blockHeight) {
             for(int targetX = 0; targetX < width; targetX += blockWidth) {
@@ -57,5 +59,38 @@ public class MotionExtractor {
         }
         
         return dist / (curBlockHeight * curBlockWidth);
+    }
+    
+    public List<Double> motionDistance(List<Set<String>> queriedVideoMotions, List<Set<String>> candidateVideoMotions) {
+        List<Double> distList = new ArrayList<>();
+        int nFrame = queriedVideoMotions.size();
+        int nTotalFrame = candidateVideoMotions.size();
+        
+        for(int cur = 0; cur < nTotalFrame - nFrame; cur++) {
+            if(cur == 120) {
+                int test = 0;
+            }
+            distList.add(motionDistance(queriedVideoMotions, candidateVideoMotions, cur));
+        }
+        
+        return distList;
+    } 
+    
+    public double motionDistance(List<Set<String>> queriedVideoMotions, List<Set<String>> candidateVideoMotions, int sFrame) {
+        int dist = 0;
+        int nFrame = queriedVideoMotions.size();
+        for(int i = 0; i < nFrame; i++) {
+            Set<String> queriedFrameMotions = queriedVideoMotions.get(i);
+            Set<String> candidateFrameMotions = candidateVideoMotions.get(i + sFrame);
+            int same = 0;
+            for(String queriedMotion : queriedFrameMotions) {
+                if(candidateFrameMotions.contains(queriedMotion))same++;
+            }
+            dist += queriedFrameMotions.size() + candidateFrameMotions.size() - 2 * same;
+            if(dist != 0) {
+                int test = 0;
+            }
+        }
+        return dist * 1.0 / nFrame;
     }
 }
