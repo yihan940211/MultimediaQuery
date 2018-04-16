@@ -29,7 +29,7 @@ public class AudioExtractor {
      *            incoming complex numbers, the length must be power of 2.
      * @return FFT values
      */
-    public static Complex[] fastFourierTransform(Complex[] x) {
+    public Complex[] fastFourierTransform(Complex[] x) {
         int n = x.length;
 
         // base case
@@ -74,7 +74,7 @@ public class AudioExtractor {
      *            the video in the databases
      * @return distance
      */
-    public static double findDistance(List<Integer> target, List<Integer> candidate) {
+    public  double audioDistance(List<Integer> target, List<Integer> candidate) {
         int t_length = target.size();
         int c_length = candidate.size();
         int min = Integer.MAX_VALUE;
@@ -97,7 +97,7 @@ public class AudioExtractor {
      * @return the index of major frequency
      *
      */
-    public static int calculateFFT(byte[] pcm_signal) {
+    public  int calculateFFT(byte[] pcm_signal) {
 
         double temp;
         Complex[] y;
@@ -135,27 +135,25 @@ public class AudioExtractor {
      * @throws UnsupportedAudioFileException
      * @throws IOException
      */
-    public static List<Integer> readFile(String fileName) throws UnsupportedAudioFileException, IOException {
+    public  List<Integer> readFile(String fileName)  {
         File file = new File(fileName);
+        List<Integer> freq = new ArrayList<Integer>();
+        try{
         AudioInputStream in = AudioSystem.getAudioInputStream(file);
         byte[] data = new byte[window_size * in.getFormat().getSampleSizeInBits() / 8];
         int read = 0;
-        List<Integer> freq = new ArrayList<Integer>();
+        
         while ((read = in.read(data)) > 0) {
             int index = calculateFFT(data);
             freq.add(index);
+        }
+        }catch(Exception e)
+        {
+            
         }
         return freq;
         //1722 frames for database videos, 432 frames for query videos
     }
 
-    public static void main(String[] args) throws IOException, UnsupportedAudioFileException {
-
-        String filename = "./audio/movie.wav";
-        List<Integer> candidate = readFile(filename);
-        String filename2 = "./audio/first.wav";
-        List<Integer> target = readFile(filename2);
-        double dist = findDistance(target, candidate);
-        System.out.println(dist);
-    }
+ 
 }

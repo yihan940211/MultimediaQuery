@@ -28,12 +28,14 @@ public class QueryEngine {
         Video video;
         List<List<Integer>> videoColors;
         List<Set<String>> videoMotions;
+        List<Integer> videoAudios;
         double dist;
         
         public VideoFeatures(Video video) {
             this.video = video;
             this.videoColors = new ArrayList<>();
             this.videoMotions = new ArrayList<>();
+            this.videoAudios=new ArrayList<>();
             this.dist = 0;
         }
     }
@@ -81,12 +83,15 @@ public class QueryEngine {
     
     MotionExtractor motionExtractor;
     
+    AudioExtractor audioExtractor;
+    
     public QueryEngine(DisplayMain displayMain, String databasePath) {
         this.displayMain = displayMain;
         this.databasePath = databasePath;
         this.databaseFeaturesPath = this.databasePath + "features.txt";
         this.colorExtractor = new ColorExtractor();
         this.motionExtractor = new MotionExtractor();
+        this.audioExtractor=new AudioExtractor();
         
         File file = new File(this.databasePath);
         videoFiles = file.listFiles();
@@ -105,6 +110,7 @@ public class QueryEngine {
         this.databaseFeaturesPath = this.databasePath + "features.txt";
         this.colorExtractor = new ColorExtractor();
         this.motionExtractor = new MotionExtractor();
+        this.audioExtractor= new AudioExtractor();
         
         File file = new File(this.databasePath);
         videoFiles = file.listFiles();
@@ -174,7 +180,21 @@ public class QueryEngine {
                         bw.newLine();
                     }
                 }
-                
+                if(videoFeatures.videoAudios.size()!=0)
+                {
+                    bw.write("Audio");
+                    bw.newLine();
+                    int nFrames = videoFeatures.videoAudios.size();
+                    bw.write(Integer.toString(nFrames));
+                    bw.newLine();
+                    for (int frameAudios : videoFeatures.videoAudios) {
+                        StringBuilder frameAudiosSB = new StringBuilder();
+                        
+                        frameAudiosSB.append(frameAudios);
+                        bw.write(frameAudiosSB.toString());
+                        bw.newLine();
+                    }
+                }
                 bw.write("END");
                 bw.newLine();
             }
@@ -233,7 +253,16 @@ public class QueryEngine {
                             }
                             break;
                         }
-                        
+                        case "Audio": {
+                            line = br.readLine();
+                            int nFrames = Integer.parseInt(line);
+                            for (int i = 0; i < nFrames; i++) {
+                                line = br.readLine();
+                                int frameAudios=Integer.parseInt(line);
+                                videosFeatures[index].videoAudios.add(frameAudios);
+                            }
+                            break;
+                        }
                         default: end = true; break;
                     }
                 }
@@ -260,9 +289,11 @@ public class QueryEngine {
 //        analyzeVideoColor(videoFeatures);
         
         // To do: extract motion features
-        analyzeVideoMotion(videoFeatures);
+        //analyzeVideoMotion(videoFeatures);
         
         // To do: extract audio features
+        
+        analyzeVideoAudio(videoFeatures);
     }
     
     public void analyzeVideoColor(VideoFeatures videoFeatures) {
@@ -291,7 +322,13 @@ public class QueryEngine {
             videoFeatures.videoMotions.add(frameMotions);
         }
     }
-    
+    public void analyzeVideoAudio(VideoFeatures videoFeatures)
+    {
+        Video video = videoFeatures.video;
+        String audioPath=video.folder + "/" + video.videoName+".wav";
+        List<Integer> frameAudios=audioExtractor.readFile(audioPath);
+        videoFeatures.videoAudios=frameAudios;
+    }
     public void query(Video queriedVideo) {
         (new Thread(new QueryEngineThread(queriedVideo))).start();
     }
@@ -306,17 +343,22 @@ public class QueryEngine {
 //        }
         
         // To do: calculate distance based on motion features
-        List<Double> motionDistList = motionExtractor.motionDistance(queriedVideoFeatures.videoMotions, candidateVideoFeatures.videoMotions); 
+//        List<Double> motionDistList = motionExtractor.motionDistance(queriedVideoFeatures.videoMotions, candidateVideoFeatures.videoMotions); 
         
-        double videoMotionDist = Double.MAX_VALUE;
-        for(double clipDist : motionDistList) {
-            videoMotionDist = Math.min(videoMotionDist, clipDist);
-        }
+ //       double videoMotionDist = Double.MAX_VALUE;
+ //       for(double clipDist : motionDistList) {
+  //          videoMotionDist = Math.min(videoMotionDist, clipDist);
+ //       }
         
         // To do: calculate distance based on audio features
+        double videoAudioDist = audioExtractor.audioDistance(queriedVideoFeatures.videoAudios, candidateVideoFeatures.videoAudios); 
+        
+       
+        
+        
         
         // To do: based on distance calculated above to calculate an overall distance
-        double videoDist = videoMotionDist;
+        double videoDist = videoAudioDist;
         
         candidateVideoFeatures.dist = videoDist;
         return videoDist;
