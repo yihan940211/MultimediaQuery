@@ -121,6 +121,7 @@ public class QueryEngine {
             videosFeatures[i] = new VideoFeatures(video);
         }
         long start = System.currentTimeMillis();
+        System.out.println("ss");
         analyzeDatabase();
         long end = System.currentTimeMillis();
         System.out.println((end - start) / 1000.0);
@@ -327,6 +328,8 @@ public class QueryEngine {
         Video video = videoFeatures.video;
         String audioPath=video.folder + "/" + video.videoName+".wav";
         List<Integer> frameAudios=audioExtractor.readFile(audioPath);
+        //System.out.println(video.videoName);
+       // System.out.println(frameAudios);
         videoFeatures.videoAudios=frameAudios;
     }
     public void query(Video queriedVideo) {
