@@ -1,4 +1,4 @@
-package extractor;
+package multimediaquery;
 
 public class Complex {
     private final double real; // the real part

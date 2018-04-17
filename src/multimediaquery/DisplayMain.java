@@ -295,6 +295,7 @@ public class DisplayMain extends javax.swing.JFrame {
     private void buttonQueryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonQueryActionPerformed
         // TODO add your handling code here:
         if(queriedVideo == null)return;
+        buttonStopMatchedVideoActionPerformed(evt);
         queryEngine.query(queriedVideo);
     }//GEN-LAST:event_buttonQueryActionPerformed
 
