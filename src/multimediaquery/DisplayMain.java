@@ -424,7 +424,9 @@ public class DisplayMain extends javax.swing.JFrame {
     public void myInit(){
         queriedVideo = null;
         matchedVideo = null;
-        databasePath = "/Users/yihanyang/Documents/USCCourse/CSCI576/Project/databse_videos";
+        //databasePath = "/Users/yihanyang/Documents/USCCourse/CSCI576/Project/databse_videos";
+        databasePath = "C:/Users/Xiaochi/Desktop/work/576/project/database_videos";
+        //databasePath="";
         queryEngine = new QueryEngine(this, databasePath);
     }
     

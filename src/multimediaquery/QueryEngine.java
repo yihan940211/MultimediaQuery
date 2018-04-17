@@ -15,7 +15,9 @@ import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -25,11 +27,15 @@ public class QueryEngine {
     class VideoFeatures {
         Video video;
         List<List<Integer>> videoColors;
+        List<Set<String>> videoMotions;
+        List<Integer> videoAudios;
         double dist;
         
         public VideoFeatures(Video video) {
             this.video = video;
             this.videoColors = new ArrayList<>();
+            this.videoMotions = new ArrayList<>();
+            this.videoAudios=new ArrayList<>();
             this.dist = 0;
         }
     }
@@ -75,11 +81,17 @@ public class QueryEngine {
     ColorExtractor colorExtractor;
     final int nBuckets = 2;
     
+    MotionExtractor motionExtractor;
+    
+    AudioExtractor audioExtractor;
+    
     public QueryEngine(DisplayMain displayMain, String databasePath) {
         this.displayMain = displayMain;
         this.databasePath = databasePath;
         this.databaseFeaturesPath = this.databasePath + "features.txt";
         this.colorExtractor = new ColorExtractor();
+        this.motionExtractor = new MotionExtractor();
+        this.audioExtractor=new AudioExtractor();
         
         File file = new File(this.databasePath);
         videoFiles = file.listFiles();
@@ -97,6 +109,8 @@ public class QueryEngine {
         this.databasePath = databasePath;
         this.databaseFeaturesPath = this.databasePath + "features.txt";
         this.colorExtractor = new ColorExtractor();
+        this.motionExtractor = new MotionExtractor();
+        this.audioExtractor= new AudioExtractor();
         
         File file = new File(this.databasePath);
         videoFiles = file.listFiles();
@@ -107,6 +121,7 @@ public class QueryEngine {
             videosFeatures[i] = new VideoFeatures(video);
         }
         long start = System.currentTimeMillis();
+        System.out.println("ss");
         analyzeDatabase();
         long end = System.currentTimeMillis();
         System.out.println((end - start) / 1000.0);
@@ -129,19 +144,60 @@ public class QueryEngine {
         try {
             fw = new FileWriter(databaseFeaturesPath);
             bw = new BufferedWriter(fw);
-            for(VideoFeatures videoFeatures : videosFeatures) {
-                int nFrames = videoFeatures.videoColors.size();
-                bw.write(Integer.toString(nFrames));
+            for(VideoFeatures videoFeatures : videosFeatures) { 
+                bw.write("Video: " + videoFeatures.video.videoName);
                 bw.newLine();
-                for(List<Integer> frameColors : videoFeatures.videoColors) {
-                    StringBuilder frameColorsSB = new StringBuilder();
-                    for(int color : frameColors) {
-                        frameColorsSB.append(Integer.toString(color));
-                        frameColorsSB.append(" ");
-                    }
-                    bw.write(frameColorsSB.toString());
+                
+                if(videoFeatures.videoColors.size() != 0) {
+                    bw.write("Color");
                     bw.newLine();
+                    int nFrames = videoFeatures.videoColors.size();
+                    bw.write(Integer.toString(nFrames));
+                    bw.newLine();
+                    for (List<Integer> frameColors : videoFeatures.videoColors) {
+                        StringBuilder frameColorsSB = new StringBuilder();
+                        for (int color : frameColors) {
+                            frameColorsSB.append(Integer.toString(color));
+                            frameColorsSB.append(" ");
+                        }
+                        bw.write(frameColorsSB.toString());
+                        bw.newLine();
+                    }
                 }
+                
+                if(videoFeatures.videoMotions.size() != 0) {
+                    bw.write("Motion");
+                    bw.newLine();
+                    int nFrames = videoFeatures.videoMotions.size();
+                    bw.write(Integer.toString(nFrames));
+                    bw.newLine();
+                    for (Set<String> frameMotions : videoFeatures.videoMotions) {
+                        StringBuilder frameMotionsSB = new StringBuilder();
+                        for (String motion : frameMotions) {
+                            frameMotionsSB.append(motion);
+                            frameMotionsSB.append(" ");
+                        }
+                        bw.write(frameMotionsSB.toString());
+                        bw.newLine();
+                    }
+                }
+                if(videoFeatures.videoAudios.size()!=0)
+                {
+                    bw.write("Audio");
+                    bw.newLine();
+                    int nFrames = videoFeatures.videoAudios.size();
+                    bw.write(Integer.toString(nFrames));
+                    bw.newLine();
+                    for (int frameAudios : videoFeatures.videoAudios) {
+                        StringBuilder frameAudiosSB = new StringBuilder();
+                        
+                        frameAudiosSB.append(frameAudios);
+                        bw.write(frameAudiosSB.toString());
+                        bw.newLine();
+                    }
+                }
+                bw.write("END");
+                bw.newLine();
             }
         } catch(Exception e) {
             
@@ -165,15 +221,51 @@ public class QueryEngine {
             br = new BufferedReader(fr);
             int index = 0;
             while((line = br.readLine()) != null) {
-                int nFrames = Integer.parseInt(line);
-                for(int i = 0; i < nFrames; i++) {
+                boolean end = false;
+                while(!end) {
                     line = br.readLine();
-                    String[] tokens = line.split(" ");
-                    List<Integer> frameColors = new ArrayList<>();
-                    for(int j = 0; j < tokens.length; j++) {
-                        frameColors.add(Integer.parseInt(tokens[j]));
+                    switch (line) {
+                        case "Color": {
+                            line = br.readLine();
+                            int nFrames = Integer.parseInt(line);
+                            for (int i = 0; i < nFrames; i++) {
+                                line = br.readLine();
+                                String[] tokens = line.split(" ");
+                                List<Integer> frameColors = new ArrayList<>();
+                                for (int j = 0; j < tokens.length; j++) {
+                                    frameColors.add(Integer.parseInt(tokens[j]));
+                                }
+                                videosFeatures[index].videoColors.add(frameColors);
+                            }
+                            break;
+                        }
+
+                        case "Motion": {
+                            line = br.readLine();
+                            int nFrames = Integer.parseInt(line);
+                            for (int i = 0; i < nFrames; i++) {
+                                line = br.readLine();
+                                String[] tokens = line.split(" ");
+                                Set<String> frameMotions = new HashSet<>();
+                                for (int j = 0; j < tokens.length; j++) {
+                                    frameMotions.add(tokens[j]);
+                                }
+                                videosFeatures[index].videoMotions.add(frameMotions);
+                            }
+                            break;
+                        }
+                        case "Audio": {
+                            line = br.readLine();
+                            int nFrames = Integer.parseInt(line);
+                            for (int i = 0; i < nFrames; i++) {
+                                line = br.readLine();
+                                int frameAudios=Integer.parseInt(line);
+                                videosFeatures[index].videoAudios.add(frameAudios);
+                            }
+                            break;
+                        }
+                        default: end = true; break;
                     }
-                    videosFeatures[index].videoColors.add(frameColors);
                 }
                 index++;
             }
@@ -195,11 +287,14 @@ public class QueryEngine {
      */
     public void analyzeVideo(VideoFeatures videoFeatures) {
         // Extract color features
-        analyzeVideoColor(videoFeatures);
+//        analyzeVideoColor(videoFeatures);
         
         // To do: extract motion features
+        //analyzeVideoMotion(videoFeatures);
         
         // To do: extract audio features
+        
+        analyzeVideoAudio(videoFeatures);
     }
     
     public void analyzeVideoColor(VideoFeatures videoFeatures) {
@@ -214,24 +309,59 @@ public class QueryEngine {
         }
     }
     
+    public void analyzeVideoMotion(VideoFeatures videoFeatures) {
+        int totalFrames = videoFeatures.video.totalFrames;
+        Video video = videoFeatures.video;
+        String imagePath = video.folder + "/" + video.videoName + "001.rgb";
+        BufferedImage targetImage = null;
+        BufferedImage candidateImage = video.readImage(imagePath);
+        for(int i = 2; i <= totalFrames; i++) {
+            targetImage = candidateImage;
+            imagePath = video.folder + "/" + video.videoName + String.format("%03d", i) + ".rgb";
+            candidateImage = video.readImage(imagePath);
+            Set<String> frameMotions = motionExtractor.motionExtractor(targetImage, candidateImage);
+            videoFeatures.videoMotions.add(frameMotions);
+        }
+    }
+    public void analyzeVideoAudio(VideoFeatures videoFeatures)
+    {
+        Video video = videoFeatures.video;
+        String audioPath=video.folder + "/" + video.videoName+".wav";
+        List<Integer> frameAudios=audioExtractor.readFile(audioPath);
+        //System.out.println(video.videoName);
+       // System.out.println(frameAudios);
+        videoFeatures.videoAudios=frameAudios;
+    }
     public void query(Video queriedVideo) {
         (new Thread(new QueryEngineThread(queriedVideo))).start();
     }
     
     public double distance(VideoFeatures queriedVideoFeatures, VideoFeatures candidateVideoFeatures) {
         // Calculate distance based on color features
-        List<Double> colorDistList = colorExtractor.colorDistance(queriedVideoFeatures.videoColors, candidateVideoFeatures.videoColors);
-        
-        double videoDist = Double.MAX_VALUE;
-        for(Double clipDist : colorDistList) {
-            videoDist = Math.min(videoDist, clipDist);
-        }
+//        List<Double> colorDistList = colorExtractor.colorDistance(queriedVideoFeatures.videoColors, candidateVideoFeatures.videoColors);
+//        
+//        double videoColorDist = Double.MAX_VALUE;
+//        for(Double clipDist : colorDistList) {
+//            videoColorDist = Math.min(videoColorDist, clipDist);
+//        }
         
         // To do: calculate distance based on motion features
+//        List<Double> motionDistList = motionExtractor.motionDistance(queriedVideoFeatures.videoMotions, candidateVideoFeatures.videoMotions); 
+        
+ //       double videoMotionDist = Double.MAX_VALUE;
+ //       for(double clipDist : motionDistList) {
+  //          videoMotionDist = Math.min(videoMotionDist, clipDist);
+ //       }
         
         // To do: calculate distance based on audio features
+        double videoAudioDist = audioExtractor.audioDistance(queriedVideoFeatures.videoAudios, candidateVideoFeatures.videoAudios); 
+        
+       
+        
+        
         
         // To do: based on distance calculated above to calculate an overall distance
+        double videoDist = videoAudioDist;
         
         candidateVideoFeatures.dist = videoDist;
         return videoDist;
