@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 package multimediaquery;
+
 import java.io.File;
 
 import java.io.IOException;
@@ -13,20 +14,20 @@ import java.util.List;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
+
 /**
- *Extract Frequency from the audio
+ * Extract Frequency from the audio
+ *
  * @author Xiaochi
  */
 public class AudioExtractor {
-    public static final int window_size = 1024;
 
     /**
      * this fft function was implmented by radix 2 Cooley-Tukey FFT.
      * Transforming the complex number to FFT values.
      *
      *
-     * @param x
-     *            incoming complex numbers, the length must be power of 2.
+     * @param x incoming complex numbers, the length must be power of 2.
      * @return FFT values
      */
     public Complex[] fastFourierTransform(Complex[] x) {
@@ -34,7 +35,8 @@ public class AudioExtractor {
 
         // base case
         if (n == 1) {
-            return new Complex[] { x[0] };
+            Complex[] result = {x[0]};
+            return result;
         }
 
         // calculate even terms
@@ -68,63 +70,69 @@ public class AudioExtractor {
      * Calculate the distance between target audio and candidate audio
      * dist=avg(min(sum(Math.abs(candidate-target))))
      *
-     * @param target
-     *            the target video we are going to search
-     * @param candidate
-     *            the video in the databases
+     * @param target the target video we are going to search
+     * @param candidate the video in the databases
      * @return distance
      */
-    public  double audioDistance(List<Integer> target, List<Integer> candidate) {
+    public List<Double> audioDistance(List<Integer> target, List<Integer> candidate) {
         int t_length = target.size();
         int c_length = candidate.size();
-        int min = Integer.MAX_VALUE;
-        for (int i = 0; i <= c_length - t_length; i++) {
-            int sum = 0;
+        List<Double> distList = new ArrayList<>();
+        for (int i = 0; i < c_length; i++) {
+            int dist = 0;
+            long sum = 0;
             for (int j = 0; j < t_length; j++) {
-                sum += Math.abs(target.get(j) - candidate.get(i + j));
+                if (i + j >= c_length) {
+                    dist += target.get(j);
+                    sum += target.get(j);
+                } else {
+                    dist += Math.abs(target.get(j) - candidate.get(i + j));
+                    sum += target.get(j);
+                }
             }
-            min = Math.min(sum, min);
+            distList.add(dist * 1.0 / sum);
         }
 
-        return min * 1.0 / t_length;
+        return distList;
     }
 
     /**
      * calculate the major frequency in incoming pcm_signal.
      *
-     * @param pcm_signal
-     *            the byte value read from audio
+     * @param pcm_signal the byte value read from audio
      * @return the index of major frequency
      *
      */
-    public  int calculateFFT(byte[] pcm_signal) {
+    public int getMajorFreq(byte[] pcm_signal) {
 
         double temp;
+        int fft_size = pcm_signal.length / 2;
         Complex[] y;
-        Complex[] complexSignal = new Complex[window_size];
-        double[] absSignal = new double[window_size / 2];
+        Complex[] complexSignal = new Complex[fft_size];
+        double[] absSignal = new double[fft_size / 2];
 
-        for (int i = 0; i < window_size; i++) {
-            temp = (double) ((pcm_signal[2 * i] & 0xFF) | (pcm_signal[2 * i + 1] << 8)) / 32768.0F;
+        for (int i = 0; i < fft_size; i++) {
+            //since the wav has two channel. we need to put them together
+            temp = ((pcm_signal[2 * i] & 0xFF) | (pcm_signal[2 * i + 1] << 8)) / (Short.MAX_VALUE + 1.0);
             complexSignal[i] = new Complex(temp, 0.0);
         }
 
         y = fastFourierTransform(complexSignal);
-        double maxSample = 0.0;
-        int maxPos = 0;
-        for (int i = 0; i < (window_size / 2); i++) {
+        double maxSignal = 0.0;
+        int maxPosIndex = 0;
+        for (int i = 0; i < (fft_size / 2); i++) {
             absSignal[i] = Math.sqrt(Math.pow(y[i].real_part(), 2) + Math.pow(y[i].imagin_part(), 2));
-            if (absSignal[i] > maxSample) {
-                maxSample = absSignal[i];
-                maxPos = i;
+            if (absSignal[i] > maxSignal) {
+                maxSignal = absSignal[i];
+                maxPosIndex = i;
             }
         }
         //return the max index for major frequency
-        //freq=index*simpleRate/window_size
+        //freq=index*simpleRate/window_size(let sample rate is 44.1k and window_size=1024
         //0:   0 * 44100 / 1024 =     0.0 Hz
         //1:   1 * 44100 / 1024 =    43.1 Hz
         //511: 511 * 44100 / 1024 = 22006.9 Hz
-        return maxPos;
+        return maxPosIndex;
     }
 
     /**
@@ -135,25 +143,31 @@ public class AudioExtractor {
      * @throws UnsupportedAudioFileException
      * @throws IOException
      */
-    public  List<Integer> readFile(String fileName)  {
-        File file = new File(fileName);
+    public List<Integer> audioExtractor(String fileName) {
         List<Integer> freq = new ArrayList<Integer>();
-        try{
-        AudioInputStream in = AudioSystem.getAudioInputStream(file);
-        byte[] data = new byte[window_size * in.getFormat().getSampleSizeInBits() / 8];
-        int read = 0;
-        
-        while ((read = in.read(data)) > 0) {
-            int index = calculateFFT(data);
-            freq.add(index);
-        }
-        }catch(Exception e)
-        {
+        try {
+            File file = new File(fileName);
+            AudioInputStream in = AudioSystem.getAudioInputStream(file);
+            int second = Math.round(in.getFrameLength() / in.getFormat().getSampleRate());
+            int frame_size = second * 30;
+            int read_size = (int) Math.ceil(in.getFrameLength() / frame_size) * in.getFormat().getFrameSize();
+            //due to the requirement of fft algorithm, the data size should be power of 2.
+            int larger_read_size = 0;
+            if(Math.log(read_size) % Math.log(2) == 0) {
+                larger_read_size = (int) Math.pow(2, (int) (Math.log(read_size) / Math.log(2)));
+            } else {
+                larger_read_size = (int) Math.pow(2, (int) (Math.log(read_size) / Math.log(2)) + 1);
+            }
             
+            byte[] data = new byte[larger_read_size];
+            int read = 0;
+            while ((read = in.read(data, 0, read_size + 1)) == read_size) {
+                int index = getMajorFreq(data);
+                freq.add(index);
+            }
+        } catch (Exception e) {
+
         }
         return freq;
-        //1722 frames for database videos, 432 frames for query videos
     }
-
- 
 }

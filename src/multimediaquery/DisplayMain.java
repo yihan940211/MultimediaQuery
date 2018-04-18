@@ -5,13 +5,17 @@
  */
 package multimediaquery;
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.border.Border;
 import multimediaquery.QueryEngine.VideoFeatures;
 
 /**
@@ -57,15 +61,15 @@ public class DisplayMain extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         listQueryResults = new javax.swing.JList<>();
+        sliderDescriptor = new javax.swing.JSlider();
+        panelDescriptor = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel1.setMaximumSize(new java.awt.Dimension(500, 500));
         jPanel1.setMinimumSize(new java.awt.Dimension(500, 500));
-        jPanel1.setSize(new java.awt.Dimension(500, 500));
 
         jPanel2.setPreferredSize(new java.awt.Dimension(375, 700));
-        jPanel2.setSize(new java.awt.Dimension(250, 500));
 
         buttonPlayQueriedVideo.setText("Play");
         buttonPlayQueriedVideo.setPreferredSize(new java.awt.Dimension(75, 30));
@@ -116,7 +120,6 @@ public class DisplayMain extends javax.swing.JFrame {
         labelQueriedVideo.setText("Queried Video");
         labelQueriedVideo.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         labelQueriedVideo.setPreferredSize(new java.awt.Dimension(352, 288));
-        labelQueriedVideo.setSize(new java.awt.Dimension(352, 288));
 
         textFieldPath.setEditable(false);
 
@@ -175,7 +178,6 @@ public class DisplayMain extends javax.swing.JFrame {
         );
 
         jPanel3.setPreferredSize(new java.awt.Dimension(375, 700));
-        jPanel3.setSize(new java.awt.Dimension(250, 500));
 
         buttonPlayMatchedVideo.setText("Play");
         buttonPlayMatchedVideo.setPreferredSize(new java.awt.Dimension(75, 30));
@@ -212,7 +214,7 @@ public class DisplayMain extends javax.swing.JFrame {
                 .addComponent(buttonPauseMatchedVideo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(12, 12, 12)
                 .addComponent(buttonStopMatchedVideo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(113, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -230,7 +232,28 @@ public class DisplayMain extends javax.swing.JFrame {
 
         jLabel3.setText("Matched Videos:");
 
+        listQueryResults.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                listQueryResultsActionPerformed(evt);
+            }
+        });
         jScrollPane1.setViewportView(listQueryResults);
+
+        sliderDescriptor.setValue(0);
+        sliderDescriptor.setEnabled(false);
+
+        panelDescriptor.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        javax.swing.GroupLayout panelDescriptorLayout = new javax.swing.GroupLayout(panelDescriptor);
+        panelDescriptor.setLayout(panelDescriptorLayout);
+        panelDescriptorLayout.setHorizontalGroup(
+            panelDescriptorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        panelDescriptorLayout.setVerticalGroup(
+            panelDescriptorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 102, Short.MAX_VALUE)
+        );
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -241,8 +264,11 @@ public class DisplayMain extends javax.swing.JFrame {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(labelMatchedVideo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 320, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
+                        .addComponent(sliderDescriptor, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(panelDescriptor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap(17, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -252,6 +278,10 @@ public class DisplayMain extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(panelDescriptor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(sliderDescriptor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addComponent(labelMatchedVideo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -335,14 +365,6 @@ public class DisplayMain extends javax.swing.JFrame {
     private void buttonPlayMatchedVideoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPlayMatchedVideoActionPerformed
         // TODO add your handling code here:
         if(matchedVideo != null) matchedVideo.stop();
-        if(listQueryResults.getSelectedIndex() < 0)return;
-        String videoName = listQueryResults.getSelectedValue().split("\t")[0];
-        for(VideoFeatures videoFeatures : queryEngine.videosFeatures) {
-            if(videoFeatures.video.videoName.equals(videoName)) {
-                matchedVideo = videoFeatures.video;
-                break;
-            }
-        }
         matchedVideo.play();
     }//GEN-LAST:event_buttonPlayMatchedVideoActionPerformed
 
@@ -357,6 +379,21 @@ public class DisplayMain extends javax.swing.JFrame {
         if(matchedVideo == null)return;
         matchedVideo.stop();
     }//GEN-LAST:event_buttonStopMatchedVideoActionPerformed
+
+    private void listQueryResultsActionPerformed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_listQueryResultsActionPerformed
+        // TODO add your handling code here:
+        if(listQueryResults.getSelectedIndex() < 0)return;
+        if(matchedVideo != null) matchedVideo.stop();
+        String videoName = listQueryResults.getSelectedValue().split("\t")[0];
+        for(VideoFeatures videoFeatures : queryEngine.videosFeatures) {
+            if(videoFeatures.video.videoName.equals(videoName)) {
+                matchedVideoFeatures = videoFeatures;
+                matchedVideo = videoFeatures.video;
+                break;
+            }
+        }
+        presentDescritor();
+    }//GEN-LAST:event_listQueryResultsActionPerformed
 
     /**
      * @param args the command line arguments
@@ -413,21 +450,26 @@ public class DisplayMain extends javax.swing.JFrame {
     private javax.swing.JLabel labelMatchedVideo;
     private javax.swing.JLabel labelQueriedVideo;
     private javax.swing.JList<String> listQueryResults;
+    private javax.swing.JPanel panelDescriptor;
+    private javax.swing.JSlider sliderDescriptor;
     private javax.swing.JTextField textFieldPath;
     // End of variables declaration//GEN-END:variables
 
     private Video queriedVideo;
     private Video matchedVideo;
+    private VideoFeatures matchedVideoFeatures;
     private String databasePath;
     private QueryEngine queryEngine;
+    private List<int[]> similarityCurve;
     
     public void myInit(){
         queriedVideo = null;
         matchedVideo = null;
-        //databasePath = "/Users/yihanyang/Documents/USCCourse/CSCI576/Project/databse_videos";
-        databasePath = "C:/Users/Xiaochi/Desktop/work/576/project/database_videos";
-        //databasePath="";
+        matchedVideoFeatures = null;
+        databasePath = "/Users/yihanyang/Documents/USCCourse/CSCI576/Project/databse_videos";
+//        databasePath = "C:/Users/Xiaochi/Desktop/work/576/project/database_videos";
         queryEngine = new QueryEngine(this, databasePath);
+        similarityCurve = new ArrayList<>();
     }
     
     public void displayQueriedVideo(BufferedImage image){
@@ -442,8 +484,45 @@ public class DisplayMain extends javax.swing.JFrame {
         DefaultListModel<String> defaultListModel = new DefaultListModel<>();
         for(int i = 0; i < queryResults.size(); i++) {
             VideoFeatures videoFeatures = queryResults.get(i);
-            defaultListModel.add(i, videoFeatures.video.videoName + "\t" + videoFeatures.dist);
+            defaultListModel.add(i, videoFeatures.video.videoName + "\t" + String.format("%.2f", videoFeatures.similarity * 100) + "%");
         }
         listQueryResults.setModel(defaultListModel);
+    }
+    
+    public void presentDescritor() {
+        Graphics g = panelDescriptor.getGraphics();
+        g.setColor(panelDescriptor.getBackground());
+        for(int i = 1; i < similarityCurve.size(); i++) {
+            int x1 = similarityCurve.get(i - 1)[0];
+            int y1 = similarityCurve.get(i - 1)[1];
+            int x2 = similarityCurve.get(i)[0];
+            int y2 = similarityCurve.get(i)[1];
+            g.drawLine(x1, y1, x2, y2);
+        }
+        
+        similarityCurve.clear();
+        
+        g.setColor(Color.red);
+        int width = panelDescriptor.getWidth() - 2;
+        int height = panelDescriptor.getHeight() - 2;
+        List<Double> similarityList = matchedVideoFeatures.similarityList;
+        int n = similarityList.size();
+        double step = width * 1.0 / n;
+        for(int i = 1; i < n; i++) {
+            int x1 = (int)Math.round((i - 1) * step) + 1;
+            int y1 = height - (int)Math.round(height * similarityList.get(i - 1)) + 1;
+            int x2 = (int)Math.round((i) * step + 1);
+            int y2 = height - (int)Math.round(height * similarityList.get(i)) + 1;
+            if(i == 1) {
+                similarityCurve.add(new int[]{x1, y1});
+            }
+            similarityCurve.add(new int[]{x2, y2});
+            g.drawLine(x1, y1, x2, y2);
+        }
+    }
+    
+    public void setSliderDescriptor(int currentFrame, int totalFrames) {
+        int value = (int)(currentFrame * 1.0 / totalFrames * 100);
+        sliderDescriptor.setValue(value);
     }
 }

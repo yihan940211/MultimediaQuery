@@ -66,10 +66,7 @@ public class MotionExtractor {
         int nFrame = queriedVideoMotions.size();
         int nTotalFrame = candidateVideoMotions.size();
         
-        for(int cur = 0; cur < nTotalFrame - nFrame; cur++) {
-            if(cur == 120) {
-                int test = 0;
-            }
+        for(int cur = 0; cur < nTotalFrame; cur++) {
             distList.add(motionDistance(queriedVideoMotions, candidateVideoMotions, cur));
         }
         
@@ -78,19 +75,26 @@ public class MotionExtractor {
     
     public double motionDistance(List<Set<String>> queriedVideoMotions, List<Set<String>> candidateVideoMotions, int sFrame) {
         int dist = 0;
+        int sum = 0;
         int nFrame = queriedVideoMotions.size();
         for(int i = 0; i < nFrame; i++) {
             Set<String> queriedFrameMotions = queriedVideoMotions.get(i);
-            Set<String> candidateFrameMotions = candidateVideoMotions.get(i + sFrame);
-            int same = 0;
-            for(String queriedMotion : queriedFrameMotions) {
-                if(candidateFrameMotions.contains(queriedMotion))same++;
+            if(i + sFrame >= candidateVideoMotions.size()) {
+                dist += queriedFrameMotions.size();
+                sum += queriedFrameMotions.size();
+            } else {
+                Set<String> candidateFrameMotions = candidateVideoMotions.get(i + sFrame);
+                int same = 0;
+                for (String queriedMotion : queriedFrameMotions) {
+                    if (candidateFrameMotions.contains(queriedMotion)) {
+                        same++;
+                    }
+                }
+                dist += queriedFrameMotions.size() + candidateFrameMotions.size() - 2 * same;
+                sum += queriedFrameMotions.size() + candidateFrameMotions.size();
             }
-            dist += queriedFrameMotions.size() + candidateFrameMotions.size() - 2 * same;
-            if(dist != 0) {
-                int test = 0;
-            }
+            
         }
-        return dist * 1.0 / nFrame;
+        return dist * 1.0 / sum;
     }
 }

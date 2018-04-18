@@ -251,7 +251,7 @@ public class ColorExtractor {
         int nFrame = queriedVideoColors.size();
         int nTotalFrame = candidateVideoColors.size();
         
-        for(int cur = 0; cur < nTotalFrame - nFrame; cur++) {
+        for(int cur = 0; cur < nTotalFrame; cur++) {
             distList.add(colorDistance(queriedVideoColors, candidateVideoColors, cur));
         }
         
@@ -262,23 +262,35 @@ public class ColorExtractor {
         double dist = 0;
         int nFrame = queriedVideoColors.size();
         int nColors = queriedVideoColors.get(0).size();
+        int maxFrameDist = nColors * 3 * 255;
         for(int i = 0; i < nFrame; i++) {
             List<Integer> queriedFrameColors = queriedVideoColors.get(i);
-            List<Integer> candidateFrameColors = candidateVideoColors.get(i + sFrame);
-            for(int j = 0; j < nColors; j++) {
-                int queriedColor = queriedFrameColors.get(j);
-                int queriedR = ((queriedColor >>> 16) & (0xff));
-                int queriedG = ((queriedColor >>> 8) & (0xff));
-                int queriedB = (queriedColor & (0xff));
-                
-                int candidateColor = candidateFrameColors.get(j);
-                int candidateR = ((candidateColor >>> 16) & (0xff));
-                int candidateG = ((candidateColor >>> 8) & (0xff));
-                int candidateB = (candidateColor & (0xff));
-                
-                dist = dist + Math.abs(queriedR - candidateR) + Math.abs(queriedG - candidateG) + Math.abs(queriedB - candidateB);
+            if(i + sFrame >= candidateVideoColors.size()) {
+                for (int j = 0; j < nColors; j++) {
+                    int queriedColor = queriedFrameColors.get(j);
+                    int queriedR = ((queriedColor >>> 16) & (0xff));
+                    int queriedG = ((queriedColor >>> 8) & (0xff));
+                    int queriedB = (queriedColor & (0xff));
+                    dist = dist + queriedR + queriedG + queriedB;
+                }
+            } else {
+                List<Integer> candidateFrameColors = candidateVideoColors.get(i + sFrame);
+                for (int j = 0; j < nColors; j++) {
+                    int queriedColor = queriedFrameColors.get(j);
+                    int queriedR = ((queriedColor >>> 16) & (0xff));
+                    int queriedG = ((queriedColor >>> 8) & (0xff));
+                    int queriedB = (queriedColor & (0xff));
+
+                    int candidateColor = candidateFrameColors.get(j);
+                    int candidateR = ((candidateColor >>> 16) & (0xff));
+                    int candidateG = ((candidateColor >>> 8) & (0xff));
+                    int candidateB = (candidateColor & (0xff));
+
+                    dist = dist + Math.abs(queriedR - candidateR) + Math.abs(queriedG - candidateG) + Math.abs(queriedB - candidateB);
+                }
             }
+            
         }
-        return dist / (nFrame * nColors);
+        return dist / (nFrame * maxFrameDist);
     }
 }

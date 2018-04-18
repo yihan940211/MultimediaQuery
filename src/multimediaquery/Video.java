@@ -36,16 +36,12 @@ public class Video {
                 lock.unlock();
                 if (!tempPause && !tempStop) {
                     if(currentFrame > totalFrames) {
-                        currentFrame = 1;
+                        resetCurrentFrame();
                         closeAudio();
                         openAudio();
                     }
-                    //System.out.println(folder);
-                    //System.out.println(videoName);
                     File file = new File(folder + "/" + videoName + String.format("%03d", currentFrame) + ".rgb");
                     currentImage = readImage(folder + "/" + videoName + String.format("%03d", currentFrame) + ".rgb");
-                    //File file = new File( folder+"/" + String.format("%03d", currentFrame) + ".rgb");
-                    //currentImage = readImage( folder+"/" + String.format("%03d", currentFrame) + ".rgb");
                     displayImage();
                     
                     nBytes = readAudio(audioBuffer);
@@ -56,11 +52,11 @@ public class Video {
                     } catch (Exception e) {
 
                     }
-                    currentFrame++;
+                    increaseCurrentFrame();
                 } else if (tempPause) {
                     break;
                 } else {
-                    currentFrame = 1;
+                    resetCurrentFrame();
                     closeAudio();
                     openAudio();
                     break;
@@ -93,7 +89,7 @@ public class Video {
         this.mode = mode; // mode == 1 if this is query video, else mode == 2
         this.displayMain = displayMain;
         this.folder = folder;
-        this.videoName = folder.substring(folder.lastIndexOf("\\") + 1);
+        this.videoName = folder.substring(folder.lastIndexOf("/") + 1);
         this.totalFrames = (new File(folder)).list().length - 1;
         this.currentFrame = 1;
         this.currentImage = null;
@@ -207,5 +203,19 @@ public class Video {
         lock.lock();
         stop = true;
         lock.unlock();
+    }
+    
+    public void increaseCurrentFrame(){
+        currentFrame++;
+        if(mode == 2) {
+            displayMain.setSliderDescriptor(currentFrame, totalFrames);
+        }
+    }
+    
+    public void resetCurrentFrame(){
+        currentFrame = 1;
+        if(mode == 2) {
+            displayMain.setSliderDescriptor(currentFrame, totalFrames);
+        }
     }
 }

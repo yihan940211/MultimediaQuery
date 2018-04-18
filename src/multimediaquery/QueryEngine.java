@@ -29,14 +29,16 @@ public class QueryEngine {
         List<List<Integer>> videoColors;
         List<Set<String>> videoMotions;
         List<Integer> videoAudios;
-        double dist;
+        double similarity;
+        List<Double> similarityList;
         
         public VideoFeatures(Video video) {
             this.video = video;
             this.videoColors = new ArrayList<>();
             this.videoMotions = new ArrayList<>();
             this.videoAudios=new ArrayList<>();
-            this.dist = 0;
+            this.similarity = 0;
+            this.similarityList = new ArrayList<>();
         }
     }
     
@@ -55,14 +57,14 @@ public class QueryEngine {
             // Compare features of queried video and features of videos in database
             List<VideoFeatures> queryResults = new ArrayList<>();
             for (VideoFeatures candidateVideoFeatures : videosFeatures) {
-                distance(queriedVideoFeatures, candidateVideoFeatures);
+                similarity(queriedVideoFeatures, candidateVideoFeatures);
                 queryResults.add(candidateVideoFeatures);
             }
             
             // Sort query results based on distance
             queryResults.sort(new Comparator<VideoFeatures>() {
                 public int compare(VideoFeatures videoFeatures1, VideoFeatures videoFeatures2) {
-                    return (int) (videoFeatures1.dist - videoFeatures2.dist);
+                    return Double.compare(videoFeatures2.similarity, videoFeatures1.similarity);
                 }
             });
             
@@ -91,7 +93,7 @@ public class QueryEngine {
         this.databaseFeaturesPath = this.databasePath + "features.txt";
         this.colorExtractor = new ColorExtractor();
         this.motionExtractor = new MotionExtractor();
-        this.audioExtractor=new AudioExtractor();
+        this.audioExtractor= new AudioExtractor();
         
         File file = new File(this.databasePath);
         videoFiles = file.listFiles();
@@ -120,11 +122,10 @@ public class QueryEngine {
             Video video = new Video(this.displayMain, videoFiles[i + 1].getAbsolutePath(), 2);
             videosFeatures[i] = new VideoFeatures(video);
         }
-        long start = System.currentTimeMillis();
-        System.out.println("ss");
+//        long start = System.currentTimeMillis();
         analyzeDatabase();
-        long end = System.currentTimeMillis();
-        System.out.println((end - start) / 1000.0);
+//        long end = System.currentTimeMillis();
+//        System.out.println((end - start) / 1000.0);
         writeFeaturesOfDB();
     }
     
@@ -181,6 +182,7 @@ public class QueryEngine {
                         bw.newLine();
                     }
                 }
+                
                 if(videoFeatures.videoAudios.size()!=0)
                 {
                     bw.write("Audio");
@@ -196,6 +198,7 @@ public class QueryEngine {
                         bw.newLine();
                     }
                 }
+                
                 bw.write("END");
                 bw.newLine();
             }
@@ -254,6 +257,7 @@ public class QueryEngine {
                             }
                             break;
                         }
+                        
                         case "Audio": {
                             line = br.readLine();
                             int nFrames = Integer.parseInt(line);
@@ -264,6 +268,7 @@ public class QueryEngine {
                             }
                             break;
                         }
+                        
                         default: end = true; break;
                     }
                 }
@@ -287,13 +292,12 @@ public class QueryEngine {
      */
     public void analyzeVideo(VideoFeatures videoFeatures) {
         // Extract color features
-//        analyzeVideoColor(videoFeatures);
+        analyzeVideoColor(videoFeatures);
         
         // To do: extract motion features
-        //analyzeVideoMotion(videoFeatures);
+        analyzeVideoMotion(videoFeatures);
         
         // To do: extract audio features
-        
         analyzeVideoAudio(videoFeatures);
     }
     
@@ -323,48 +327,89 @@ public class QueryEngine {
             videoFeatures.videoMotions.add(frameMotions);
         }
     }
+    
     public void analyzeVideoAudio(VideoFeatures videoFeatures)
     {
         Video video = videoFeatures.video;
         String audioPath=video.folder + "/" + video.videoName+".wav";
-        List<Integer> frameAudios=audioExtractor.readFile(audioPath);
-        //System.out.println(video.videoName);
-       // System.out.println(frameAudios);
+        List<Integer> frameAudios=audioExtractor.audioExtractor(audioPath);
         videoFeatures.videoAudios=frameAudios;
     }
+    
     public void query(Video queriedVideo) {
         (new Thread(new QueryEngineThread(queriedVideo))).start();
     }
     
-    public double distance(VideoFeatures queriedVideoFeatures, VideoFeatures candidateVideoFeatures) {
+    public double similarity(VideoFeatures queriedVideoFeatures, VideoFeatures candidateVideoFeatures) {
+        int currentIndex = 0;
+        int candidateIndex = 0;
+        double videoSimilarity = 0;
+        
         // Calculate distance based on color features
-//        List<Double> colorDistList = colorExtractor.colorDistance(queriedVideoFeatures.videoColors, candidateVideoFeatures.videoColors);
-//        
-//        double videoColorDist = Double.MAX_VALUE;
+        List<Double> colorDistList = colorExtractor.colorDistance(queriedVideoFeatures.videoColors, candidateVideoFeatures.videoColors);
+        
+//        double videoColorSimilarity = 0;
+//        currentIndex = 0;
 //        for(Double clipDist : colorDistList) {
-//            videoColorDist = Math.min(videoColorDist, clipDist);
+//            if(videoColorSimilarity < Math.max(0, 1 - clipDist))candidateIndex = currentIndex;
+//            currentIndex++;
+//            videoColorSimilarity = Math.max(videoColorSimilarity, Math.max(0, 1 - clipDist));
 //        }
+//        videoSimilarity = videoColorSimilarity;
+//        System.out.println(candidateIndex);
         
         // To do: calculate distance based on motion features
-//        List<Double> motionDistList = motionExtractor.motionDistance(queriedVideoFeatures.videoMotions, candidateVideoFeatures.videoMotions); 
+        List<Double> motionDistList = motionExtractor.motionDistance(queriedVideoFeatures.videoMotions, candidateVideoFeatures.videoMotions); 
         
- //       double videoMotionDist = Double.MAX_VALUE;
- //       for(double clipDist : motionDistList) {
-  //          videoMotionDist = Math.min(videoMotionDist, clipDist);
- //       }
+//        double videoMotionSimilarity = 0;
+//        currentIndex = 0;
+//        for(double clipDist : motionDistList) {
+//            if(videoMotionSimilarity < Math.max(0, 1 - clipDist))candidateIndex = currentIndex;
+//            currentIndex++;
+//            videoMotionSimilarity = Math.max(videoMotionSimilarity, Math.max(0, 1 - clipDist));
+//        }
+//        videoSimilarity = videoMotionSimilarity;
+//        System.out.println(candidateIndex);
         
         // To do: calculate distance based on audio features
-        double videoAudioDist = audioExtractor.audioDistance(queriedVideoFeatures.videoAudios, candidateVideoFeatures.videoAudios); 
+        List<Double> audioDistList = audioExtractor.audioDistance(queriedVideoFeatures.videoAudios, candidateVideoFeatures.videoAudios);
         
-       
-        
-        
+//        double videoAudioSimilarity = Double.MIN_VALUE;
+//        currentIndex = 0;
+//        for(double clipDist : audioDistList) {
+//            if(videoAudioSimilarity < Math.max(0, 1 - clipDist))candidateIndex = currentIndex;
+//            currentIndex++;
+//            videoAudioSimilarity = Math.max(videoAudioSimilarity, Math.max(0, 1 - clipDist));
+//        }
+//        videoSimilarity = videoAudioSimilarity;
+//        System.out.println(candidateIndex);
         
         // To do: based on distance calculated above to calculate an overall distance
-        double videoDist = videoAudioDist;
+        List<Double> videoSimilarityList = new ArrayList<>();
+        int nFrame = candidateVideoFeatures.video.totalFrames;
+        final double alpha[] = {0.5, 0.25, 0.25};
+        videoSimilarity = 0;
+        for(int i = 0; i < nFrame - 1; i++) {
+            double colorDist = colorDistList.get(i);
+            double motionDist = motionDistList.get(i);
+//            double step = audioDistList.size() * 1.0 / nFrame;
+//            int audioIndex = (int)(step * i);
+//            double audioSum = 0;
+//            for(int j = audioIndex; j < Math.min(audioDistList.size(), audioIndex + Math.round(step)); j++) {
+//                audioSum += audioDistList.get(j);
+//            }
+//            double audioDist = audioSum / Math.round(step);
+            double audioDist = audioDistList.get(i);
+            
+            double similarity = Math.max(0, 1 - colorDist) * alpha[0] + Math.max(0, 1 - motionDist) * alpha[1] + Math.max(0, 1 - audioDist) * alpha[2];
+
+            videoSimilarity = Math.max(videoSimilarity, similarity);
+            videoSimilarityList.add(similarity);
+        }
         
-        candidateVideoFeatures.dist = videoDist;
-        return videoDist;
+        candidateVideoFeatures.similarity = videoSimilarity;
+        candidateVideoFeatures.similarityList = videoSimilarityList;
+        return videoSimilarity;
     }
     
     public void displayQueryResults(List<VideoFeatures> queryResults) {
