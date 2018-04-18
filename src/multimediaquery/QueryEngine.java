@@ -121,7 +121,6 @@ public class QueryEngine {
             videosFeatures[i] = new VideoFeatures(video);
         }
         long start = System.currentTimeMillis();
-        System.out.println("ss");
         analyzeDatabase();
         long end = System.currentTimeMillis();
         System.out.println((end - start) / 1000.0);
