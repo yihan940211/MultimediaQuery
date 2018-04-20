@@ -326,7 +326,7 @@ public class QueryEngine {
     {
         Video video = videoFeatures.video;
         String audioPath=video.folder + "/" + video.videoName+".wav";
-        List<Integer> frameAudios=audioExtractor.readFile(audioPath);
+        List<Integer> frameAudios=audioExtractor.audioExtractor(audioPath);
         //System.out.println(video.videoName);
        // System.out.println(frameAudios);
         videoFeatures.videoAudios=frameAudios;
@@ -353,9 +353,12 @@ public class QueryEngine {
  //       }
         
         // To do: calculate distance based on audio features
-        double videoAudioDist = audioExtractor.audioDistance(queriedVideoFeatures.videoAudios, candidateVideoFeatures.videoAudios); 
+         List<Double> audioDistList = audioExtractor.audioDistance(queriedVideoFeatures.videoAudios, candidateVideoFeatures.videoAudios); 
         
-       
+       double videoAudioDist = Double.MAX_VALUE;
+       for(double clipDist : audioDistList) {
+           videoAudioDist = Math.min(videoAudioDist, clipDist);
+       }      
         
         
         
